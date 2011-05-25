@@ -1,0 +1,285 @@
+This is mmm.info, produced by makeinfo version 4.0 from mmm.texinfo.
+
+INFO-DIR-SECTION GNU Emacs Lisp
+START-INFO-DIR-ENTRY
+* MMM-Mode: (mmm).                 Multiple Major Modes for Emacs
+END-INFO-DIR-ENTRY
+
+   This is edition 0.4.7 of the MMM Mode Manual, last updated 18
+February 2001. It documents version 0.4.7 of MMM Mode.
+
+   Copyright 2000 Michael Abraham Shulman.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided also
+that the sections entitled "Copying" and "GNU General Public License"
+are included exactly as in the original, and provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+
+   Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+
+File: mmm.info,  Node: File Variables,  Next: Here-documents,  Prev: Mason,  Up: Supplied Classes
+
+Elisp in a Local Variables List
+===============================
+
+   Emacs allows the author of a file to specify major and minor modes
+to be used while editing that file, as well as specifying values for
+other local Elisp variables, with a File Variables list.  *Note File
+Variables: (emacs)File Variables.  Since file variables values are
+Elisp objects (and with the `eval' special "variable", they are forms
+to be evaluated), one might want to edit them in `emacs-lisp-mode'.
+The submode class `file-variables' allows this, and is suitable for
+turning on in a given file with `mmm-classes', or in all files with
+`mmm-global-classes'.
+
+
+File: mmm.info,  Node: Here-documents,  Next: Javascript,  Prev: File Variables,  Up: Supplied Classes
+
+Here-documents
+==============
+
+   One of the long-time standard syntaxes for outputting large amounts
+of code (or text, or HTML, or whatever) from a script (notably shell
+scripts and Perl scripts) is the here-document syntax:
+
+     print <<END_HTML;
+     <html>
+       <head>
+         <title>Test Page</title>
+       </head>
+       <body>
+     END_HTML
+
+   The `here-doc' submode class recognizes this syntax, and can even
+guess the correct submode to use in many cases.  For instance, it would
+put the above example in `html-mode', noticing the string `HTML' in the
+name of the here-document.  If you use less than evocative
+here-document names, or if the submode is recognized incorrectly for
+any other reason, you can tell it explicitly what submode to use.
+
+ - User Option: mmm-here-doc-mode-alist
+     The value of this variable should be an alist, each element a cons
+     pair associating a regular expression to a submode symbol.
+     Whenever a here-document name matches one of these regexps, the
+     corresponding submode is applied.  For example, if this variable
+     contains the element `("CODE" . cc-mode)', then any here-document
+     whose name contains the string `CODE' will be put in `cc-mode'.
+     The value of this variable overrides any guessing that the
+     `here-doc' submode class would do otherwise.
+
+
+File: mmm.info,  Node: Javascript,  Next: Embedded CSS,  Prev: Here-documents,  Up: Supplied Classes
+
+Javascript in HTML
+==================
+
+   The submode class `html-js' allows for embedding Javascript code in
+HTML documents.  It recognizes both this syntax:
+
+     <script language="Javascript">
+     function foo(...) {
+        ...
+     }
+     </script>
+
+   and this syntax:
+
+     <input type="button" onClick="validate();">
+
+   The mode used for Javascript regions is controlled by the user;
+*Note Preferred Modes::.
+
+
+File: mmm.info,  Node: Embedded CSS,  Next: Embperl,  Prev: Javascript,  Up: Supplied Classes
+
+CSS embedded in HTML
+====================
+
+   CSS (Cascading Style Sheets) can also be embedded in HTML.  The
+`embedded-css' submode class recognizes this syntax:
+
+     <style>
+     h1 {
+        ...
+     }
+     </style>
+
+   It uses `css-mode' if present, `c++-mode' otherwise.  This can be
+customized: *Note Preferred Modes::.
+
+
+File: mmm.info,  Node: Embperl,  Next: ePerl,  Prev: Embedded CSS,  Up: Supplied Classes
+
+Embperl: More Perl in HTML
+==========================
+
+   Embperl is another syntax for embedding Perl in HTML.  See
+`http://perl.apache.org/embperl' for more information.  The `embperl'
+submode class recognizes most if not all of the Embperl embedding
+syntax.  Its Perl mode is also controllable by the user; *Note
+Preferred Modes::.
+
+
+File: mmm.info,  Node: ePerl,  Next: JSP,  Prev: Embperl,  Up: Supplied Classes
+
+ePerl: General Perl Embedding
+=============================
+
+   Yet another syntax for embedding Perl is called ePerl.  See
+`http://www.engelschall.com/sw/eperl/' for more information.  The
+`eperl' submode class handles this syntax, using the Perl mode
+specified by the user; *Note Preferred Modes::.
+
+
+File: mmm.info,  Node: JSP,  Next: RPM,  Prev: ePerl,  Up: Supplied Classes
+
+JSP: Java Embedded in HTML
+==========================
+
+   JSP (Java Server Pages) is a syntax for embedding Java code in HTML.
+The submode class `jsp' handles this syntax, using a Java mode
+specified by the user; *Note Preferred Modes::.  The default is
+`jde-mode' if present, otherwise `java-mode'.
+
+
+File: mmm.info,  Node: RPM,  Prev: JSP,  Up: Supplied Classes
+
+RPM Spec Files
+==============
+
+   `mmm-rpm.el' contains the definition of an MMM Mode submode class
+for editing shell script sections within RPM (Redhat Package Manager)
+spec files.  It is recommended for use in combination with
+`rpm-spec-mode.el' by Stig Bjørlykke <stigb@tihlde.hist.no> and Steve
+Sanbeg <sanbeg@dset.com>
+(`http://www.xemacs.org/~stigb/rpm-spec-mode.el').
+
+   Suggested setup code:
+
+     (add-to-list 'mmm-mode-ext-classes-alist
+                  '(rpm-spec-mode "\\.spec\\'" rpm-sh))
+
+   Thanks to Marcus Harnisch <Marcus.Harnisch@gmx.net> for contributing
+this submode class.
+
+
+File: mmm.info,  Node: Writing Classes,  Next: Indices,  Prev: Supplied Classes,  Up: Top
+
+Writing Submode Classes
+***********************
+
+   Sometimes (perhaps often) you may want to use MMM with a syntax for
+which it is suited, but for which no submode is supplied.  In such cases
+you may have to write your own submode class.  This chapter briefly
+describes how to write a submode class, from the basic to the advanced,
+with examples.
+
+* Menu:
+
+* Basic Classes::               Writing a simple submode class.
+* Paired Delimiters::           Matching paired delimiters.
+* Region Placement::            Placing the region more accurately.
+* Submode Groups::              Grouping several classes together.
+* Calculated Submodes::         Deciding the submode at run-time.
+* Calculated Faces::            Deciding the display face at run-time.
+* Insertion Commands::          Inserting regions automatically.
+* Other Hooks::                 Running code at arbitrary points.
+* Delimiter Forms::             Storing the form of the delimiters.
+* Misc Keywords::               Other miscellaneous options.
+
+
+File: mmm.info,  Node: Basic Classes,  Next: Paired Delimiters,  Prev: Writing Classes,  Up: Writing Classes
+
+Writing Basic Submode Classes
+=============================
+
+   Writing a submode class can become rather complex, if the syntax to
+match is complicated and you want to take advantage of some of MMM
+Mode's extra features.  But a simple submode class is not particularly
+difficult to write.  This section describes the basics of writing
+submode classes.
+
+   Submode classes are stored in the variable `mmm-classes-alist'.
+Each element of this list represents a single submode class.  For
+convenience, the function `mmm-add-classes' takes a list of submode
+classes and adds them all to this alist.  Each class is represented by a
+list containing the class name--a symbol such as `mason' or
+`html-js'--followed by pairs of keywords and arguments called a "class
+specifier".  For example, consider the specifier for the submode class
+`embedded-css':
+
+     (mmm-add-classes
+      '((embedded-css
+         :submode css
+         :face mmm-declaration-submode-face
+         :front "<style[^>]*>"
+         :back "</style>")))
+
+   The name of the submode is `embedded-css', the first element of the
+list.  The rest of the list consists of pairs of keywords (symbols
+beginning with a colon) such as `:submode' and `:front', and arguments,
+such as `css' and `"<style[^>]*>"'.  It is the keywords and arguments
+that specify how the submode works.  The order of keywords is not
+important; all that matters is the arguments that follow them.
+
+   The three most important keywords are `:submode', `:front', and
+`:back'.  The argument following `:submode' names the major mode to use
+in submode regions.  It can be either a symbol naming a major mode,
+such as `text-mode' or `c++-mode', or a symbol to look up in
+`mmm-major-mode-preferences' (*note Preferred Modes::) such as `css',
+as in this case.
+
+   The arguments following `:front' and `:back' are regular expressions
+(*note Regexps: (emacs)Regexps.) that should match the delimiter
+strings which begin and end the submode regions.  In our example, CSS
+regions begin with a `<style>' tag, possibly with parameters, and end
+with a `</style>' tag.
+
+   The argument following `:face' specifies the face (background color)
+to use when `mmm-submode-decoration-level' is 2 (high coloring).  *Note
+Region Coloring::, for a list of canonical available faces.
+
+   There are many more possible keywords arguments.  In the following
+sections, we will examine each of them and their uses in writing submode
+classes.
+
+
+File: mmm.info,  Node: Paired Delimiters,  Next: Region Placement,  Prev: Basic Classes,  Up: Writing Classes
+
+Matching Paired Delimiters
+==========================
+
+   A simple pair of regular expressions does not always suffice to
+exactly specify the beginning and end of submode regions correctly.
+For this reason, there are several other possible keyword/argument
+pairs which influence the matching process.
+
+   Many submode regions are marked by paired delimiters.  For example,
+the tags used by Mason (*note Mason::) include `<%init>...</%init>' and
+`<%args>...</%args>'.  It would be possible to write a separate submode
+class for each type of region, but there is an easier way: the keyword
+argument `:save-matches'.  If supplied and non-nil, it causes the
+regular expression `:back', before being searched for, to be formatted
+by replacing all strings of the form `~N' (where N is an integer) with
+the corresponding numbered subexpression of the match for `:front'.  As
+an example, here is an excerpt from the `here-doc' submode class.
+*Note Here-documents::, for more information about this submode.
+
+     :front "<<\\([a-zA-Z0-9_-]+\\)"
+     :back "^~1$"
+     :save-matches 1
+
+   The regular expression for `:front' matches `<<' followed by a
+string of one or more alphanumeric characters, underscores, and dashes.
+The latter string, which happens to be the name of the here-document, is
+saved as the first subexpression, since it
